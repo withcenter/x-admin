@@ -1,0 +1,3 @@
+[submodule "src/x-vue"]
+	path = src/x-vue
+	url = https://github.com/withcenter/x-vue
