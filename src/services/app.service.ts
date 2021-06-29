@@ -11,6 +11,7 @@ export class AppService {
   }
 
   logout(): void {
+    console.log("logout");
     ApiService.instance.logout();
     store.commit("user", new UserModel());
   }

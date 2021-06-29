@@ -24,6 +24,7 @@ import {
   ToastPlugin,
   FormSelectPlugin,
   FormCheckboxPlugin,
+  FormGroupPlugin,
 } from "bootstrap-vue";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -48,6 +49,7 @@ Vue.use(ToastPlugin);
 
 Vue.use(FormCheckboxPlugin);
 Vue.use(FormSelectPlugin);
+Vue.use(FormGroupPlugin);
 
 Vue.config.productionTip = false;
 

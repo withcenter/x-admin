@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <h1>Login</h1>
+  <div class="w-50 mx-auto">
     <login @submit="onSubmit"></login>
   </div>
 </template>
@@ -22,6 +21,7 @@ export default class LoginView extends Vue {
     try {
       const user = await ApiService.instance.login(form);
       this.$store.commit("user", user);
+      this.$router.push("/");
     } catch (e) {
       this.$app.error(e);
     }

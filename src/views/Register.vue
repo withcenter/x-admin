@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <h1>Login</h1>
+  <div class="w-50 mx-auto">
     <register @submit="onSubmit"></register>
   </div>
 </template>
@@ -20,6 +19,7 @@ export default class LoginView extends Vue {
   async onSubmit(event: Event, form: Request): Promise<void> {
     try {
       this.$store.commit("user", await ApiService.instance.register(form));
+      this.$router.push("/");
     } catch (e) {
       this.$app.error(e);
     }
