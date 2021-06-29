@@ -1,27 +1,25 @@
 <template>
   <div>
     <h1>Login</h1>
-    <login @submit="onSubmit"></login>
+    <register @submit="onSubmit"></register>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import Login from "@/x-vue/components/user/Login.vue";
-
+import Register from "@/x-vue/components/user/Register.vue";
 import { ApiService } from "@/x-vue/services/api.service";
 
 @Component({
   components: {
-    Login,
+    Register,
   },
 })
 export default class LoginView extends Vue {
   async onSubmit(event: Event, form: Request): Promise<void> {
     try {
-      const user = await ApiService.instance.login(form);
-      this.$store.commit("user", user);
+      this.$store.commit("user", await ApiService.instance.register(form));
     } catch (e) {
       this.$app.error(e);
     }
