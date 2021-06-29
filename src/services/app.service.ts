@@ -3,6 +3,7 @@ import { ApiService } from "@/x-vue/services/api.service";
 import { UserModel } from "@/x-vue/services/interfaces";
 
 export class AppService {
+  api: ApiService = ApiService.instance;
   alert(msg: string): void {
     alert(msg);
   }

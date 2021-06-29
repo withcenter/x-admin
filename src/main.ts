@@ -54,7 +54,8 @@ Vue.use(FormGroupPlugin);
 Vue.config.productionTip = false;
 
 ApiService.instance.init({
-  serverUrl: "https://main.philov.com/index.php",
+  serverUrl: process.env.VUE_APP_SERVER_URL ?? "",
+  apiKey: process.env.VUE_APP_API_KEY ?? "",
   userChanges: (user: UserModel) => {
     store.state.user = user;
   },

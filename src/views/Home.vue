@@ -1,18 +1,17 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <login-first></login-first>
+    <h1>Home</h1>
+    <div>
+      {{ $app.api.serverUrl }}
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import LoginFirst from "@/x-vue/components/user/LoginFirst.vue";
 
 @Component({
-  components: {
-    LoginFirst,
-  },
+  components: {},
 })
 export default class Home extends Vue {}
 </script>
