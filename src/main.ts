@@ -8,7 +8,7 @@ import { UserModel } from "./x-vue/services/interfaces";
 Vue.config.productionTip = false;
 
 ApiService.instance.init({
-  host: "main.philov.com",
+  serverUrl: "https://main.philov.com/index.php",
   userChanges: (user: UserModel) => {
     store.state.user = user;
   },
