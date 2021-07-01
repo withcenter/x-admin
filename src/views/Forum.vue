@@ -36,6 +36,10 @@ export default class Forum extends Vue {
     this.loadPage();
     this.listenScroll();
   }
+  /// 게시판 목록을 빠져 나갈 때, scroll listen 을 중단.
+  beforeDestroy() {
+    window.onscroll = null;
+  }
   /// 카테고리가 변경 되면, 초기하 하고, 다시 게시판 첫 페이지를 로드.
   @Watch("$route.params.categoryId")
   onCategoryIdChange(categoryId: string, old: string) {
