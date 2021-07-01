@@ -30,7 +30,11 @@ const routes: Array<RouteConfig> = [
     name: "Register",
     component: () => import("../views/Register.vue"),
   },
-
+  {
+    path: "/forum/:categoryId",
+    name: "Forum",
+    component: () => import("../views/Forum.vue"),
+  },
   {
     path: "/admin",
     // name: "Admin",
