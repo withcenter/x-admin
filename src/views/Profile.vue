@@ -1,6 +1,6 @@
 <template>
   <div class="w-50 mx-auto">
-    <profile @submit="onSubmit" @on-error="$app.error"></profile>
+    <profile @submit="onSubmit" @error="$app.error($event)"></profile>
   </div>
 </template>
 
@@ -17,12 +17,6 @@ import { ApiService } from "@/x-vue/services/api.service";
 })
 export default class ProfileView extends Vue {
   async onSubmit(event: Event, form: Request): Promise<void> {
-    try {
-      this.$store.commit("user", await ApiService.instance.register(form));
-      this.$router.push("/");
-    } catch (e) {
-      this.$app.error(e);
-    }
     try {
       await ApiService.instance.profileUpdate(form);
       this.$app.alert("Update Success");
