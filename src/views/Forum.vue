@@ -1,14 +1,32 @@
 <template>
   <div>
-    <h1>Forum :: {{ categoryId }}</h1>
-    <div v-for="post in posts" :key="post.idx">
-      <article>
-        <h1>idx: {{ post.idx }}</h1>
-        <div class="alert alert-secondary">this is the content</div>
-      </article>
+    <div class="d-flex justify-content-between">
+      <h1>Forum :: {{ categoryId }}</h1>
+      <div>
+        <button class="btn btn-primary" @click="post.inEdit = true">
+          Create
+        </button>
+      </div>
     </div>
-    <div class="alert alert-info" v-if="loading">loading next page ...</div>
-    <div class="alert alert-warning" v-if="noMore">There is no more posts</div>
+
+    <post-edit-basic
+      class="m-3"
+      :post="post"
+      v-if="post.inEdit"
+    ></post-edit-basic>
+
+    <section v-if="post.inEdit == false">
+      <div v-for="post in posts" :key="post.idx">
+        <article>
+          <h1>idx: {{ post.idx }}</h1>
+          <div class="alert alert-secondary">this is the content</div>
+        </article>
+      </div>
+      <div class="alert alert-info" v-if="loading">loading next page ...</div>
+      <div class="alert alert-warning" v-if="noMore">
+        There is no more posts
+      </div>
+    </section>
   </div>
 </template>
 
@@ -18,9 +36,10 @@ import { PostModel } from "@/x-vue/services/interfaces";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch } from "vue-property-decorator";
+import PostEditBasic from "@/x-vue/components/basic/post/PostEditBasic.vue";
 
 @Component({
-  components: {},
+  components: { PostEditBasic },
 })
 export default class Forum extends Vue {
   api = ApiService.instance;
@@ -29,6 +48,7 @@ export default class Forum extends Vue {
   limit = 12;
   loading = false;
   noMore = false;
+  post = new PostModel();
   get categoryId(): string {
     return this.$route.params.categoryId;
   }

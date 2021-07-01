@@ -52,3 +52,9 @@
     </div>
   </div>
 </template>
+<style lang="scss">
+.s-sm {
+  width: 1em;
+  height: 1em;
+}
+</style>
