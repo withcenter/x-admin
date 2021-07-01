@@ -3,7 +3,9 @@
     <header>
       <b-navbar type="dark" variant="info">
         <b-navbar-nav>
-          <b-nav-item to="/">Home </b-nav-item>
+          <b-nav-item to="/">Home</b-nav-item>
+          <b-nav-item to="/forum/qna">QnA</b-nav-item>
+          <b-nav-item to="/forum/discussion">Discussion</b-nav-item>
           <b-nav-item v-if="$app.notLoggedIn" to="/login">Login</b-nav-item>
           <b-nav-item v-if="$app.notLoggedIn" to="/register">
             Register
@@ -44,11 +46,7 @@
         </b-navbar-nav>
       </b-navbar>
     </header>
-    <div>
-      {{ $app.user.admin }}
-      Welcome, {{ $store.state.user.nickname }},
-      {{ $store.state.user.sessionId }}
-    </div>
+
     <div>
       <router-view />
     </div>
