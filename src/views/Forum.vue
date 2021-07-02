@@ -4,7 +4,10 @@
       <h1 v-if="forum.categoryId">Forum :: {{ forum.categoryId }}</h1>
 
       <div>
-        <button class="btn btn-primary" @click="forum.post.inEdit = true">
+        <button
+          class="btn btn-primary"
+          @click="forum.post.toCreate(forum.categoryId)"
+        >
           Create
         </button>
       </div>
@@ -17,6 +20,9 @@
       <div v-for="post in forum.posts" :key="post.idx">
         <article>
           <h1>idx: {{ post.idx }}</h1>
+
+          <FileList :post="post"></FileList>
+
           <div class="alert alert-secondary">
             {{ post.title }} {{ post.content }}
           </div>
@@ -38,34 +44,37 @@ import { ForumInterface, PostModel } from "@/x-vue/services/interfaces";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch } from "vue-property-decorator";
-import PostEditBasic from "@/x-vue/components/basic/post/PostEditBasic.vue";
-import PostListLoading from "@/x-vue/components/basic/post/PostListLoading.vue";
-import PostListNoMore from "@/x-vue/components/basic/post/PostListNoMore.vue";
+import PostEditBasic from "@/x-vue/components/post/PostEditBasic.vue";
+import PostListLoading from "@/x-vue/components/post/PostListLoading.vue";
+import PostListNoMore from "@/x-vue/components/post/PostListNoMore.vue";
+import FileList from "@/x-vue/components/file/FileList.vue";
 
 @Component({
-  components: { PostEditBasic, PostListLoading, PostListNoMore },
+  components: { PostEditBasic, PostListLoading, PostListNoMore, FileList },
 })
 export default class Forum extends Vue {
   api = ApiService.instance;
   forum: ForumInterface = new ForumInterface();
 
-  mounted() {
+  mounted(): void {
     this.forum.categoryId = this.$route.params.categoryId;
     console.log("this.forum.categoryId", this.forum.categoryId);
     this.loadPage();
     this.listenScroll();
+    // this.forum.post.toCreate(this.forum.categoryId);
   }
   /// 게시판 목록을 빠져 나갈 때, scroll listen 을 중단.
-  beforeDestroy() {
+  beforeDestroy(): void {
     window.onscroll = null;
   }
   /// 카테고리가 변경 되면, 초기하 하고, 다시 게시판 첫 페이지를 로드.
   @Watch("$route.params.categoryId")
-  onCategoryIdChange(categoryId: string, old: string) {
+  onCategoryIdChange(categoryId: string): void {
     this.forum = new ForumInterface();
     this.forum.categoryId = categoryId;
     this.loadPage();
   }
+
   /// 다음 페이지 로드
   async loadPage(): Promise<void> {
     if (this.forum.canLoad) return;
@@ -83,7 +92,7 @@ export default class Forum extends Vue {
   }
 
   /// 사용자가 스크롤하는 것을 listen 해서, 페이지 아래쪽에 닿으면 다음 페이지를 로드한다.
-  listenScroll() {
+  listenScroll(): void {
     window.onscroll = () => {
       const bottomOfWindow =
         document.documentElement.scrollTop + window.innerHeight >
@@ -94,7 +103,7 @@ export default class Forum extends Vue {
     };
   }
 
-  onEdit(post: PostModel) {
+  onEdit(post: PostModel): void {
     this.forum.post = post;
     post.inEdit = true;
   }
