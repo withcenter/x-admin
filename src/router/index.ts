@@ -37,11 +37,6 @@ const routes: Array<RouteConfig> = [
   },
 
   {
-    path: "/sample",
-    name: "Sample",
-    component: () => import("../views/Sample.vue"),
-  },
-  {
     path: "/admin",
     // name: "Admin",
     component: () => import("@/x-vue/components/admin/Admin.vue"),
@@ -109,6 +104,12 @@ const routes: Array<RouteConfig> = [
           import(
             "@/x-vue/components/admin/advertisement/AdminAdvertisement.vue"
           ),
+      },
+
+      {
+        path: "samples",
+        name: "Samples",
+        component: () => import("@/x-vue/components/samples/Samples.vue"),
       },
     ],
   },
