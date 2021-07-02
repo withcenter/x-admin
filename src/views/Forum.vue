@@ -4,7 +4,10 @@
       <h1 v-if="forum.categoryId">Forum :: {{ forum.categoryId }}</h1>
 
       <div>
-        <button class="btn btn-primary" @click="forum.post.inEdit = true">
+        <button
+          class="btn btn-primary"
+          @click="forum.post.toCreate(forum.categoryId)"
+        >
           Create
         </button>
       </div>
@@ -17,6 +20,9 @@
       <div v-for="post in forum.posts" :key="post.idx">
         <article>
           <h1>idx: {{ post.idx }}</h1>
+
+          <FileList :post="post"></FileList>
+
           <div class="alert alert-secondary">
             {{ post.title }} {{ post.content }}
           </div>
@@ -41,9 +47,10 @@ import { Watch } from "vue-property-decorator";
 import PostEditBasic from "@/x-vue/components/basic/post/PostEditBasic.vue";
 import PostListLoading from "@/x-vue/components/basic/post/PostListLoading.vue";
 import PostListNoMore from "@/x-vue/components/basic/post/PostListNoMore.vue";
+import FileList from "@/x-vue/components/file/FileList.vue";
 
 @Component({
-  components: { PostEditBasic, PostListLoading, PostListNoMore },
+  components: { PostEditBasic, PostListLoading, PostListNoMore, FileList },
 })
 export default class Forum extends Vue {
   api = ApiService.instance;
@@ -54,6 +61,7 @@ export default class Forum extends Vue {
     console.log("this.forum.categoryId", this.forum.categoryId);
     this.loadPage();
     this.listenScroll();
+    // this.forum.post.toCreate(this.forum.categoryId);
   }
   /// 게시판 목록을 빠져 나갈 때, scroll listen 을 중단.
   beforeDestroy() {
