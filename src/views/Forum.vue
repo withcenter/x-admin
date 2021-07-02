@@ -22,6 +22,7 @@
           <div class="alert alert-secondary">this is the content</div>
         </article>
       </div>
+
       <div class="alert alert-info" v-if="loading">loading next page ...</div>
       <div class="alert alert-warning" v-if="noMore">
         There is no more posts
