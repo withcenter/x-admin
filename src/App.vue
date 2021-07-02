@@ -58,3 +58,16 @@
   height: 1em;
 }
 </style>
+
+<script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
+import ThumbnailWithText from "@/x-vue/widgets/post/ThumbnailWithText.vue";
+
+@Component({
+  components: {
+    ThumbnailWithText,
+  },
+})
+export default class PostEdit extends Vue {}
+</script>

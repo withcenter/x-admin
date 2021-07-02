@@ -1,59 +1,57 @@
 <template>
   <div>
     <div class="d-flex justify-content-between">
-      <h1>Forum :: {{ categoryId }}</h1>
+      <h1 v-if="forum.categoryId">Forum :: {{ forum.categoryId }}</h1>
+
       <div>
-        <button class="btn btn-primary" @click="post.inEdit = true">
+        <button class="btn btn-primary" @click="forum.post.inEdit = true">
           Create
         </button>
       </div>
     </div>
 
-    <post-edit-basic
-      class="m-3"
-      :post="post"
-      v-if="post.inEdit"
-    ></post-edit-basic>
+    <PostEditBasic class="m-3" :forum="forum"></PostEditBasic>
 
-    <section v-if="post.inEdit == false">
-      <div v-for="post in posts" :key="post.idx">
+    <post-list-loading :page="forum.page"></post-list-loading>
+    <section v-if="forum.post.inEdit == false">
+      <div v-for="post in forum.posts" :key="post.idx">
         <article>
           <h1>idx: {{ post.idx }}</h1>
-          <div class="alert alert-secondary">this is the content</div>
+          <div class="alert alert-secondary">
+            {{ post.title }} {{ post.content }}
+          </div>
+          <button class="btn btn-secondary btn-sm" @click="onEdit(post)">
+            edit
+          </button>
         </article>
       </div>
 
-      <div class="alert alert-info" v-if="loading">loading next page ...</div>
-      <div class="alert alert-warning" v-if="noMore">
-        There is no more posts
-      </div>
+      <PostListLoading></PostListLoading>
+      <PostListNoMore></PostListNoMore>
     </section>
   </div>
 </template>
 
 <script lang="ts">
 import { ApiService } from "@/x-vue/services/api.service";
-import { PostModel } from "@/x-vue/services/interfaces";
+import { ForumInterface, PostModel } from "@/x-vue/services/interfaces";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch } from "vue-property-decorator";
 import PostEditBasic from "@/x-vue/components/basic/post/PostEditBasic.vue";
+import PostListLoading from "@/x-vue/components/basic/post/PostListLoading.vue";
+import PostListNoMore from "@/x-vue/components/basic/post/PostListNoMore.vue";
 
 @Component({
-  components: { PostEditBasic },
+  components: { PostEditBasic, PostListLoading, PostListNoMore },
 })
 export default class Forum extends Vue {
   api = ApiService.instance;
-  posts: PostModel[] = [];
-  pageNo = 0;
-  limit = 12;
-  loading = false;
-  noMore = false;
-  post = new PostModel();
-  get categoryId(): string {
-    return this.$route.params.categoryId;
-  }
+  forum: ForumInterface = new ForumInterface();
+
   mounted() {
+    this.forum.categoryId = this.$route.params.categoryId;
+    console.log("this.forum.categoryId", this.forum.categoryId);
     this.loadPage();
     this.listenScroll();
   }
@@ -64,33 +62,26 @@ export default class Forum extends Vue {
   /// 카테고리가 변경 되면, 초기하 하고, 다시 게시판 첫 페이지를 로드.
   @Watch("$route.params.categoryId")
   onCategoryIdChange(categoryId: string, old: string) {
-    this.pageNo = 0;
-    this.posts = [];
-    this.loading = false;
-    this.noMore = false;
+    this.forum = new ForumInterface();
+    this.forum.categoryId = categoryId;
     this.loadPage();
   }
   /// 다음 페이지 로드
   async loadPage(): Promise<void> {
-    if (this.loading || this.noMore) return;
-    this.loading = true;
-    this.pageNo++;
-    console.log("loading page no: ", this.pageNo);
+    if (this.forum.canLoad) return;
+    this.forum.beginLoad();
     try {
-      const posts = await this.api.postSearch({
-        categoryId: this.categoryId,
-        page: this.pageNo,
-        limit: this.limit,
-      });
-      if (posts.length < this.limit) this.noMore = true;
+      const posts = await this.api.postSearch(this.forum.searchOptions);
+      if (posts.length < this.forum.limit) this.forum.noMore = true;
       for (const post of posts) {
-        this.posts.push(post);
+        this.forum.posts.push(post);
       }
     } catch (e) {
       alert(e);
     }
-    this.loading = false;
+    this.forum.endLoad();
   }
+
   /// 사용자가 스크롤하는 것을 listen 해서, 페이지 아래쪽에 닿으면 다음 페이지를 로드한다.
   listenScroll() {
     window.onscroll = () => {
@@ -101,6 +92,11 @@ export default class Forum extends Vue {
         this.loadPage();
       }
     };
+  }
+
+  onEdit(post: PostModel) {
+    this.forum.post = post;
+    post.inEdit = true;
   }
 }
 </script>
