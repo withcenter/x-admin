@@ -44,7 +44,6 @@
 </style>
 <script lang="ts">
 import { ApiService } from "@/x-vue/services/api.service";
-import { ForumInterface, PostModel } from "@/x-vue/interfaces/interfaces";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch } from "vue-property-decorator";
@@ -53,6 +52,7 @@ import PostListLoading from "@/x-vue/components/post/PostListLoading.vue";
 import PostListNoMore from "@/x-vue/components/post/PostListNoMore.vue";
 import PostListTitleClosed from "@/x-vue/components/post/PostListTitleClosed.vue";
 import FileList from "@/x-vue/components/file/FileList.vue";
+import { ForumInterface } from "@/x-vue/interfaces/forum.interface";
 
 @Component({
   components: {
