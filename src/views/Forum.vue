@@ -24,7 +24,21 @@
             <PostEditButton :post="post"></PostEditButton>
             <PostDeleteButton :post="post"></PostDeleteButton>
           </div>
-          <CommentEditForm></CommentEditForm>
+          <CommentEditForm :post="post" :parent="post"></CommentEditForm>
+          <div class="no-of-comments">{{ post.comments.length }} comments</div>
+          <div class="comment-list">
+            <div class="comment" :depth="comment.depth" v-for="comment of post.comments" :key="comment.idx">
+              <FileList :post="comment"></FileList>
+              <CommentContent :comment="comment"></CommentContent>
+              <div class="buttons d-flex">
+                <button class="btn btn-secondary btn-sm mr-2" @click="comment.inReply = !comment.inReply">reply</button>
+                <VoteButtons :post="comment"></VoteButtons>
+                edit delete
+              </div>
+
+              <CommentEditForm :post="post" :parent="comment" v-if="comment.inReply"></CommentEditForm>
+            </div>
+          </div>
         </section>
       </article>
 
@@ -42,6 +56,48 @@
     white-space: pre-line;
   }
 }
+
+.comment-list .comment {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  background-color: rgb(220, 220, 207);
+}
+[depth="1"] {
+  margin-left: 1em;
+}
+[depth="2"] {
+  margin-left: 2em;
+}
+[depth="3"] {
+  margin-left: 3em;
+}
+[depth="4"] {
+  margin-left: 4em;
+}
+[depth="5"] {
+  margin-left: 5em;
+}
+[depth="6"] {
+  margin-left: 6em;
+}
+[depth="7"] {
+  margin-left: 7em;
+}
+[depth="8"] {
+  margin-left: 8em;
+}
+[depth="9"] {
+  margin-left: 9em;
+}
+[depth="10"],
+[depth="11"],
+[depth="12"],
+[depth="13"],
+[depth="14"],
+[depth="15"],
+[depth="16"] {
+  margin-left: 10em;
+}
 </style>
 <script lang="ts">
 import { ApiService } from "@/x-vue/services/api.service";
@@ -58,6 +114,7 @@ import VoteButtons from "@/x-vue/components/forum_v2/buttons/VoteButtons.vue";
 import PostEditButton from "@/x-vue/components/forum_v2/post/PostEditButton.vue";
 import PostDeleteButton from "@/x-vue/components/forum_v2/post/PostDeleteButton.vue";
 import CommentEditForm from "@/x-vue/components/forum_v2/comment/CommentEditForm.vue";
+import CommentContent from "@/x-vue/components/forum_v2/comment/CommentContent.vue";
 
 @Component({
   components: {
@@ -70,6 +127,7 @@ import CommentEditForm from "@/x-vue/components/forum_v2/comment/CommentEditForm
     PostEditButton,
     PostDeleteButton,
     CommentEditForm,
+    CommentContent,
   },
 })
 export default class Forum extends Vue {
@@ -124,13 +182,12 @@ export default class Forum extends Vue {
   subscribeScroll(): void {
     window.addEventListener("scroll", this.scrollWatch);
   }
-  unsubscribeScroll() {
+  unsubscribeScroll(): void {
     window.removeEventListener("scroll", this.scrollWatch);
   }
   scrollWatch(): void {
     const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight >
-      document.documentElement.offsetHeight - 300;
+      document.documentElement.scrollTop + window.innerHeight > document.documentElement.offsetHeight - 300;
     if (bottomOfWindow) {
       this.loadPage();
     }
