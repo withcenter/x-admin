@@ -12,13 +12,12 @@
 
     <PostEditForm class="m-3" :forum="forum" @edited="onEdit" @cancelled="onCancel"></PostEditForm>
 
-    <post-list-loading :page="forum.page"></post-list-loading>
     <section v-if="forum.post.inEdit == false">
       <article v-for="post in forum.posts" :key="post.idx">
         <PostListTitleClosed :post="post"></PostListTitleClosed>
         <section class="post-body" v-if="post.inView">
           <FileList :post="post"></FileList>
-          <div class="post-content" v-html="post.content"></div>
+          <div class="post-content">{{ post.content }}</div>
           <div class="buttons d-flex">
             <VoteButtons :post="post"></VoteButtons>
             <PostEditButton :post="post"></PostEditButton>
@@ -28,15 +27,19 @@
           <div class="no-of-comments">{{ post.comments.length }} comments</div>
           <div class="comment-list">
             <div class="comment" :depth="comment.depth" v-for="comment of post.comments" :key="comment.idx">
+              <CommentMeta :comment="comment"></CommentMeta>
               <FileList :post="comment"></FileList>
               <CommentContent :comment="comment"></CommentContent>
+
               <div class="buttons d-flex">
                 <button class="btn btn-secondary btn-sm mr-2" @click="comment.inReply = !comment.inReply">reply</button>
                 <VoteButtons :post="comment"></VoteButtons>
-                edit delete
+                <CommentEditButton :comment="comment"></CommentEditButton>
+                <CommentDeleteButton :comment="comment"></CommentDeleteButton>
               </div>
 
               <CommentEditForm :post="post" :parent="comment" v-if="comment.inReply"></CommentEditForm>
+              <CommentEditForm :post="post" :comment="comment" v-if="comment.inEdit"></CommentEditForm>
             </div>
           </div>
         </section>
@@ -47,58 +50,6 @@
     </section>
   </div>
 </template>
-<style lang="scss" scoped>
-.forum {
-  margin: 1em;
-  .post-content {
-    padding: 1em;
-    background-color: beige;
-    white-space: pre-line;
-  }
-}
-
-.comment-list .comment {
-  margin-top: 0.25em;
-  margin-bottom: 0.25em;
-  background-color: rgb(220, 220, 207);
-}
-[depth="1"] {
-  margin-left: 1em;
-}
-[depth="2"] {
-  margin-left: 2em;
-}
-[depth="3"] {
-  margin-left: 3em;
-}
-[depth="4"] {
-  margin-left: 4em;
-}
-[depth="5"] {
-  margin-left: 5em;
-}
-[depth="6"] {
-  margin-left: 6em;
-}
-[depth="7"] {
-  margin-left: 7em;
-}
-[depth="8"] {
-  margin-left: 8em;
-}
-[depth="9"] {
-  margin-left: 9em;
-}
-[depth="10"],
-[depth="11"],
-[depth="12"],
-[depth="13"],
-[depth="14"],
-[depth="15"],
-[depth="16"] {
-  margin-left: 10em;
-}
-</style>
 <script lang="ts">
 import { ApiService } from "@/x-vue/services/api.service";
 import Vue from "vue";
@@ -114,7 +65,10 @@ import VoteButtons from "@/x-vue/components/forum_v2/buttons/VoteButtons.vue";
 import PostEditButton from "@/x-vue/components/forum_v2/post/PostEditButton.vue";
 import PostDeleteButton from "@/x-vue/components/forum_v2/post/PostDeleteButton.vue";
 import CommentEditForm from "@/x-vue/components/forum_v2/comment/CommentEditForm.vue";
+import CommentMeta from "@/x-vue/components/forum_v2/comment/CommentMeta.vue";
 import CommentContent from "@/x-vue/components/forum_v2/comment/CommentContent.vue";
+import CommentDeleteButton from "@/x-vue/components/forum_v2/comment/CommentDeleteButton.vue";
+import CommentEditButton from "@/x-vue/components/forum_v2/comment/CommentEditButton.vue";
 
 @Component({
   components: {
@@ -127,7 +81,10 @@ import CommentContent from "@/x-vue/components/forum_v2/comment/CommentContent.v
     PostEditButton,
     PostDeleteButton,
     CommentEditForm,
+    CommentMeta,
     CommentContent,
+    CommentDeleteButton,
+    CommentEditButton,
   },
 })
 export default class Forum extends Vue {
@@ -155,6 +112,7 @@ export default class Forum extends Vue {
   /// 다음 페이지 로드
   async loadPage(): Promise<void> {
     if (this.forum.canLoad) return;
+    console.log("this.forum.page", this.forum.page);
     this.forum.beginLoad();
     try {
       const posts = await this.api.postSearch(this.forum.searchOptions);
@@ -208,3 +166,56 @@ export default class Forum extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.forum {
+  margin: 1em;
+  .post-content {
+    padding: 1em;
+    background-color: beige;
+    white-space: pre-line;
+  }
+}
+
+.comment-list .comment {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  background-color: rgb(220, 220, 207);
+}
+[depth="1"] {
+  margin-left: 1em;
+}
+[depth="2"] {
+  margin-left: 2em;
+}
+[depth="3"] {
+  margin-left: 3em;
+}
+[depth="4"] {
+  margin-left: 4em;
+}
+[depth="5"] {
+  margin-left: 5em;
+}
+[depth="6"] {
+  margin-left: 6em;
+}
+[depth="7"] {
+  margin-left: 7em;
+}
+[depth="8"] {
+  margin-left: 8em;
+}
+[depth="9"] {
+  margin-left: 9em;
+}
+[depth="10"],
+[depth="11"],
+[depth="12"],
+[depth="13"],
+[depth="14"],
+[depth="15"],
+[depth="16"] {
+  margin-left: 10em;
+}
+</style>
