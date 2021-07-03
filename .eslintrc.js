@@ -20,15 +20,13 @@ module.exports = {
       "error",
       {
         endOfLine: "auto",
+        printWidth: 100,
       },
     ],
   },
   overrides: [
     {
-      files: [
-        "**/__tests__/*.{j,t}s?(x)",
-        "**/tests/unit/**/*.spec.{j,t}s?(x)",
-      ],
+      files: ["**/__tests__/*.{j,t}s?(x)", "**/tests/unit/**/*.spec.{j,t}s?(x)"],
       env: {
         mocha: true,
       },

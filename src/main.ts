@@ -4,7 +4,7 @@ import router from "./router";
 import { AppService } from "./services/app.service";
 import store from "./store";
 import { ApiService } from "./x-vue/services/api.service";
-import { UserModel } from "./x-vue/services/interfaces";
+import { UserModel } from "./x-vue/interfaces/interfaces";
 
 import {
   AvatarPlugin,

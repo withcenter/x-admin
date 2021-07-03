@@ -1,4 +1,4 @@
-import { UserModel } from "@/x-vue/services/interfaces";
+import { UserModel } from "@/x-vue/interfaces/interfaces";
 import Vue from "vue";
 import Vuex from "vuex";
 

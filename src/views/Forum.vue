@@ -1,56 +1,67 @@
 <template>
-  <div>
+  <div class="forum">
     <div class="d-flex justify-content-between">
       <h1 v-if="forum.categoryId">Forum :: {{ forum.categoryId }}</h1>
 
       <div>
-        <button
-          class="btn btn-primary"
-          @click="forum.post.toCreate(forum.categoryId)"
-        >
+        <button class="btn btn-primary" @click="forum.post.toCreate(forum.categoryId)">
           Create
         </button>
       </div>
     </div>
 
-    <PostEditBasic class="m-3" :forum="forum"></PostEditBasic>
+    <PostEditBasic class="m-3" :forum="forum" @edited="arguments[0].toggleView()"></PostEditBasic>
 
     <post-list-loading :page="forum.page"></post-list-loading>
     <section v-if="forum.post.inEdit == false">
-      <div v-for="post in forum.posts" :key="post.idx">
-        <article>
-          <h1>idx: {{ post.idx }}</h1>
-
+      <article v-for="post in forum.posts" :key="post.idx">
+        <PostListTitleClosed :post="post"></PostListTitleClosed>
+        <div class="post-body" v-if="post.inView">
           <FileList :post="post"></FileList>
-
-          <div class="alert alert-secondary">
-            {{ post.title }} {{ post.content }}
+          <div class="post-content" v-html="post.content"></div>
+          <div class="buttons">
+            <button class="btn btn-secondary btn-sm" @click="post.like()">Like</button>
+            <button class="btn btn-secondary btn-sm" @click="post.dislike()">Dislike</button>
+            <button class="btn btn-secondary btn-sm" @click="forum.post.toEdit(post)">Edit</button>
           </div>
-          <button class="btn btn-secondary btn-sm" @click="onEdit(post)">
-            edit
-          </button>
-        </article>
-      </div>
+        </div>
+      </article>
 
       <PostListLoading></PostListLoading>
       <PostListNoMore></PostListNoMore>
     </section>
   </div>
 </template>
-
+<style lang="scss" scoped>
+.forum {
+  margin: 1em;
+  .post-content {
+    padding: 1em;
+    background-color: beige;
+    white-space: pre-line;
+  }
+}
+</style>
 <script lang="ts">
 import { ApiService } from "@/x-vue/services/api.service";
-import { ForumInterface, PostModel } from "@/x-vue/services/interfaces";
+import { ForumInterface, PostModel } from "@/x-vue/interfaces/interfaces";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch } from "vue-property-decorator";
 import PostEditBasic from "@/x-vue/components/post/PostEditBasic.vue";
 import PostListLoading from "@/x-vue/components/post/PostListLoading.vue";
 import PostListNoMore from "@/x-vue/components/post/PostListNoMore.vue";
+import PostListTitleClosed from "@/x-vue/components/post/PostListTitleClosed.vue";
 import FileList from "@/x-vue/components/file/FileList.vue";
 
 @Component({
-  components: { PostEditBasic, PostListLoading, PostListNoMore, FileList },
+  components: {
+    PostEditBasic,
+    PostListLoading,
+    PostListNoMore,
+    FileList,
+    PostListTitleClosed,
+  },
 })
 export default class Forum extends Vue {
   api = ApiService.instance;
@@ -84,6 +95,8 @@ export default class Forum extends Vue {
       if (posts.length < this.forum.limit) this.forum.noMore = true;
       for (const post of posts) {
         this.forum.posts.push(post);
+        /// Test. Open second post of first page.
+        if (this.forum.page == 1 && this.forum.posts.length == 2) post.toggleView();
       }
     } catch (e) {
       alert(e);
@@ -91,7 +104,7 @@ export default class Forum extends Vue {
     this.forum.endLoad();
   }
 
-  /// 사용자가 스크롤하는 것을 listen 해서, 페이지 아래쪽에 닿으면 다음 페이지를 로드한다.
+  /// 사용자가 스크롤하는 것을 listen 해서, 페이지 아래쪽에 닿으면 다음 페이지를 로드한다. -------------------------------------------
   listenScroll(): void {
     window.onscroll = () => {
       const bottomOfWindow =
@@ -101,11 +114,6 @@ export default class Forum extends Vue {
         this.loadPage();
       }
     };
-  }
-
-  onEdit(post: PostModel): void {
-    this.forum.post = post;
-    post.inEdit = true;
   }
 }
 </script>
