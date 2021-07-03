@@ -4,27 +4,28 @@
       <h1 v-if="forum.categoryId">Forum :: {{ forum.categoryId }}</h1>
 
       <div>
-        <button class="btn btn-primary" @click="forum.post.toCreate(forum.categoryId)">
-          Create
-        </button>
+        <button @click="unsubscribeScroll">Stop</button>
+        <button @click="subscribeScroll">Start</button>
+        <button class="btn btn-primary" @click="toCreate">Create</button>
       </div>
     </div>
 
-    <PostEditBasic class="m-3" :forum="forum" @edited="arguments[0].toggleView()"></PostEditBasic>
+    <PostEditForm class="m-3" :forum="forum" @edited="onEdit" @cancelled="onCancel"></PostEditForm>
 
     <post-list-loading :page="forum.page"></post-list-loading>
     <section v-if="forum.post.inEdit == false">
       <article v-for="post in forum.posts" :key="post.idx">
         <PostListTitleClosed :post="post"></PostListTitleClosed>
-        <div class="post-body" v-if="post.inView">
+        <section class="post-body" v-if="post.inView">
           <FileList :post="post"></FileList>
           <div class="post-content" v-html="post.content"></div>
-          <div class="buttons">
-            <button class="btn btn-secondary btn-sm" @click="post.like()">Like</button>
-            <button class="btn btn-secondary btn-sm" @click="post.dislike()">Dislike</button>
-            <button class="btn btn-secondary btn-sm" @click="forum.post.toEdit(post)">Edit</button>
+          <div class="buttons d-flex">
+            <VoteButtons :post="post"></VoteButtons>
+            <PostEditButton :post="post"></PostEditButton>
+            <PostDeleteButton :post="post"></PostDeleteButton>
           </div>
-        </div>
+          <CommentEditForm></CommentEditForm>
+        </section>
       </article>
 
       <PostListLoading></PostListLoading>
@@ -47,20 +48,28 @@ import { ApiService } from "@/x-vue/services/api.service";
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Watch } from "vue-property-decorator";
-import PostEditBasic from "@/x-vue/components/post/PostEditBasic.vue";
-import PostListLoading from "@/x-vue/components/post/PostListLoading.vue";
-import PostListNoMore from "@/x-vue/components/post/PostListNoMore.vue";
-import PostListTitleClosed from "@/x-vue/components/post/PostListTitleClosed.vue";
+import PostEditForm from "@/x-vue/components/forum_v2/post/PostEditForm.vue";
+import PostListLoading from "@/x-vue/components/forum_v2/post/PostListLoading.vue";
+import PostListNoMore from "@/x-vue/components/forum_v2/post/PostListNoMore.vue";
+import PostListTitleClosed from "@/x-vue/components/forum_v2/post/PostListTitleClosed.vue";
 import FileList from "@/x-vue/components/file/FileList.vue";
 import { ForumInterface } from "@/x-vue/interfaces/forum.interface";
+import VoteButtons from "@/x-vue/components/forum_v2/buttons/VoteButtons.vue";
+import PostEditButton from "@/x-vue/components/forum_v2/post/PostEditButton.vue";
+import PostDeleteButton from "@/x-vue/components/forum_v2/post/PostDeleteButton.vue";
+import CommentEditForm from "@/x-vue/components/forum_v2/comment/CommentEditForm.vue";
 
 @Component({
   components: {
-    PostEditBasic,
+    PostEditForm,
     PostListLoading,
     PostListNoMore,
     FileList,
     PostListTitleClosed,
+    VoteButtons,
+    PostEditButton,
+    PostDeleteButton,
+    CommentEditForm,
   },
 })
 export default class Forum extends Vue {
@@ -71,12 +80,11 @@ export default class Forum extends Vue {
     this.forum.categoryId = this.$route.params.categoryId;
     console.log("this.forum.categoryId", this.forum.categoryId);
     this.loadPage();
-    this.listenScroll();
-    // this.forum.post.toCreate(this.forum.categoryId);
+    this.subscribeScroll();
   }
   /// 게시판 목록을 빠져 나갈 때, scroll listen 을 중단.
   beforeDestroy(): void {
-    window.onscroll = null;
+    this.unsubscribeScroll();
   }
   /// 카테고리가 변경 되면, 초기하 하고, 다시 게시판 첫 페이지를 로드.
   @Watch("$route.params.categoryId")
@@ -95,8 +103,10 @@ export default class Forum extends Vue {
       if (posts.length < this.forum.limit) this.forum.noMore = true;
       for (const post of posts) {
         this.forum.posts.push(post);
+        /// Test. Open first post of first page.
+        if (this.forum.page == 1 && this.forum.posts.length == 1) post.toggleView();
         /// Test. Open second post of first page.
-        if (this.forum.page == 1 && this.forum.posts.length == 2) post.toggleView();
+        // if (this.forum.page == 1 && this.forum.posts.length == 2) post.toggleView();
       }
     } catch (e) {
       alert(e);
@@ -104,16 +114,40 @@ export default class Forum extends Vue {
     this.forum.endLoad();
   }
 
-  /// 사용자가 스크롤하는 것을 listen 해서, 페이지 아래쪽에 닿으면 다음 페이지를 로드한다. -------------------------------------------
-  listenScroll(): void {
-    window.onscroll = () => {
-      const bottomOfWindow =
-        document.documentElement.scrollTop + window.innerHeight >
-        document.documentElement.offsetHeight - 300;
-      if (bottomOfWindow) {
-        this.loadPage();
-      }
-    };
+  /**
+   * Listen to scroll movement for endless scroll pagination.
+   *
+   * 사용자가 스크롤하는 것을 listen 해서, 페이지 아래쪽에 닿으면 다음 페이지를 로드한다.
+   * 게시판에서 다른 게시판으로 이동 할 때, unsubscribe 또는 subscribe 를 하지 않는다.
+   * 즉, 기존 subscription 을 유지한다.
+   */
+  subscribeScroll(): void {
+    window.addEventListener("scroll", this.scrollWatch);
+  }
+  unsubscribeScroll() {
+    window.removeEventListener("scroll", this.scrollWatch);
+  }
+  scrollWatch(): void {
+    const bottomOfWindow =
+      document.documentElement.scrollTop + window.innerHeight >
+      document.documentElement.offsetHeight - 300;
+    if (bottomOfWindow) {
+      this.loadPage();
+    }
+  }
+
+  toCreate(): void {
+    this.unsubscribeScroll();
+    this.forum.post.toCreate(this.forum.categoryId);
+  }
+
+  onEdit(): void {
+    arguments[0].toggleView();
+    this.subscribeScroll();
+  }
+
+  onCancel(): void {
+    this.subscribeScroll();
   }
 }
 </script>
