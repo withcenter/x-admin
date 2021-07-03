@@ -5,9 +5,7 @@
       Matrix Server URL:
       {{ $app.api.serverUrl }}
     </div>
-    <div>
-      Matrix version: {{ version }}
-    </div>
+    <div>Matrix version: {{ version }}</div>
   </div>
 </template>
 
@@ -20,7 +18,7 @@ import { Component, Vue } from "vue-property-decorator";
   components: {},
 })
 export default class Home extends Vue {
-  version = '';
+  version = "";
   async mounted(): Promise<void> {
     try {
       this.version = await ApiService.instance.version();

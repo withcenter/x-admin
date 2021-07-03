@@ -65,7 +65,7 @@ ApiService.instance.init({
 
 Vue.prototype.$app = new AppService();
 
-const vm = new Vue({
+new Vue({
   router,
   store,
   render: (h) => h(App),
