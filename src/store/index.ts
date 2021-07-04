@@ -10,10 +10,14 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     user: new UserModel(),
+    version: "0.0.0",
   },
   mutations: {
     user: (state, user: UserModel) => {
       state.user = user;
+    },
+    version: (state, version) => {
+      state.version = version;
     },
   },
   actions: {},

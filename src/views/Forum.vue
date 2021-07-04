@@ -4,8 +4,6 @@
       <h1 v-if="forum.categoryId">Forum :: {{ forum.categoryId }}</h1>
 
       <div>
-        <button @click="unsubscribeScroll">Stop</button>
-        <button @click="subscribeScroll">Start</button>
         <button class="btn btn-primary" @click="toCreate">Create</button>
       </div>
     </div>

@@ -25,6 +25,7 @@ import {
   FormCheckboxPlugin,
   FormGroupPlugin,
   ImagePlugin,
+  SidebarPlugin,
 } from "bootstrap-vue";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -52,6 +53,7 @@ Vue.use(FormSelectPlugin);
 Vue.use(FormGroupPlugin);
 
 Vue.use(ImagePlugin);
+Vue.use(SidebarPlugin);
 
 Vue.config.productionTip = false;
 
@@ -63,7 +65,7 @@ ApiService.instance.init({
   },
 });
 
-Vue.prototype.$app = new AppService();
+Vue.prototype.$app = AppService.instance;
 
 new Vue({
   router,

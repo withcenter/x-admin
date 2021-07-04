@@ -3,7 +3,29 @@ import { ApiService } from "@/x-vue/services/api.service";
 import { UserModel } from "@/x-vue/interfaces/interfaces";
 
 export class AppService {
+  private constructor() {
+    console.log("AppService;;");
+    this.init();
+  }
+  // Singletone
+  private static _instance: AppService;
+  public static get instance(): AppService {
+    if (!AppService._instance) {
+      AppService._instance = new AppService();
+    }
+    return AppService._instance;
+  }
+
   api: ApiService = ApiService.instance;
+
+  async init(): Promise<void> {
+    try {
+      store.commit("version", await ApiService.instance.version());
+    } catch (e) {
+      this.error(e);
+    }
+  }
+
   alert(msg: string): void {
     alert(msg);
   }

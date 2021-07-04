@@ -13,4 +13,9 @@ module.exports = {
       return "../../docker/home/centerx/view/flutterkorea";
     } else return "/dist";
   })(),
+  pluginOptions: {
+    webpackBundleAnalyzer: {
+      openAnalyzer: false,
+    },
+  },
 };
