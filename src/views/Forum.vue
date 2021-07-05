@@ -21,7 +21,7 @@
             <PostEditButton :post="post"></PostEditButton>
             <PostDeleteButton :post="post"></PostDeleteButton>
           </div>
-          <CommentEditForm :post="post" :parent="post"></CommentEditForm>
+          <CommentEditForm :post="post" :parent="post" @edited="onEdit"></CommentEditForm>
           <div class="no-of-comments">{{ post.comments.length }} comments</div>
           <div class="comment-list">
             <div class="comment" :depth="comment.depth" v-for="comment of post.comments" :key="comment.idx">
@@ -36,8 +36,8 @@
                 <CommentDeleteButton :comment="comment"></CommentDeleteButton>
               </div>
 
-              <CommentEditForm :post="post" :parent="comment" v-if="comment.inReply"></CommentEditForm>
-              <CommentEditForm :post="post" :comment="comment" v-if="comment.inEdit"></CommentEditForm>
+              <CommentEditForm :post="post" :parent="comment" v-if="comment.inReply" @edited="onEdit"></CommentEditForm>
+              <CommentEditForm :post="post" :comment="comment" v-if="comment.inEdit" @edited="onEdit"></CommentEditForm>
             </div>
           </div>
         </section>
@@ -58,7 +58,7 @@ import PostListLoading from "@/x-vue/components/forum_v2/post/PostListLoading.vu
 import PostListNoMore from "@/x-vue/components/forum_v2/post/PostListNoMore.vue";
 import PostListTitleClosed from "@/x-vue/components/forum_v2/post/PostListTitleClosed.vue";
 import FileList from "@/x-vue/components/file/FileList.vue";
-import { ForumInterface } from "@/x-vue/interfaces/forum.interface";
+import { CommentModel, ForumInterface, PostModel } from "@/x-vue/interfaces/forum.interface";
 import VoteButtons from "@/x-vue/components/forum_v2/buttons/VoteButtons.vue";
 import PostEditButton from "@/x-vue/components/forum_v2/post/PostEditButton.vue";
 import PostDeleteButton from "@/x-vue/components/forum_v2/post/PostDeleteButton.vue";
@@ -154,8 +154,9 @@ export default class Forum extends Vue {
     this.forum.post.toCreate(this.forum.categoryId);
   }
 
-  onEdit(): void {
-    arguments[0].toggleView();
+  onEdit(edited: PostModel & CommentModel): void {
+    edited.toggleView();
+    // arguments[0].toggleView();
     this.subscribeScroll();
   }
 
