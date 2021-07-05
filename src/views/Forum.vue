@@ -17,7 +17,7 @@
           <FileList :post="post"></FileList>
           <div class="post-content">{{ post.content }}</div>
           <div class="buttons d-flex">
-            <VoteButtons :post="post"></VoteButtons>
+            <VoteButtons :post="post" @vote="onVote"></VoteButtons>
             <PostEditButton :post="post"></PostEditButton>
             <PostDeleteButton :post="post"></PostDeleteButton>
           </div>
@@ -31,7 +31,7 @@
 
               <div class="buttons d-flex">
                 <button class="btn btn-secondary btn-sm mr-2" @click="comment.inReply = !comment.inReply">reply</button>
-                <VoteButtons :post="comment"></VoteButtons>
+                <VoteButtons :post="comment" @vote="onVote"></VoteButtons>
                 <CommentEditButton :comment="comment"></CommentEditButton>
                 <CommentDeleteButton :comment="comment"></CommentDeleteButton>
               </div>
@@ -67,6 +67,7 @@ import CommentMeta from "@/x-vue/components/forum_v2/comment/CommentMeta.vue";
 import CommentContent from "@/x-vue/components/forum_v2/comment/CommentContent.vue";
 import CommentDeleteButton from "@/x-vue/components/forum_v2/comment/CommentDeleteButton.vue";
 import CommentEditButton from "@/x-vue/components/forum_v2/comment/CommentEditButton.vue";
+import { AppService } from "@/services/app.service";
 
 @Component({
   components: {
@@ -158,6 +159,14 @@ export default class Forum extends Vue {
     edited.toggleView();
     // arguments[0].toggleView();
     this.subscribeScroll();
+    AppService.instance.refreshProfile();
+  }
+
+  onVote(): void {
+    // post.toggleView();
+    // arguments[0].toggleView();
+    // this.subscribeScroll();
+    AppService.instance.refreshProfile();
   }
 
   onCancel(): void {

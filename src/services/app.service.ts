@@ -50,4 +50,8 @@ export class AppService {
   get notLoggedIn(): boolean {
     return store.state.user.notLoggedIn;
   }
+  async refreshProfile(): Promise<void> {
+    const user = await this.api.refreshLoginUserProfile();
+    store.commit("user", user);
+  }
 }
